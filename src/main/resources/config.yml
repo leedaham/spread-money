@@ -1,0 +1,8 @@
+config:
+  policy:
+    spread-expire-date:
+      unit: m #yMdhms
+      duration: 10 #0~
+    viewable-date:
+      unit: d #yMdhms
+      duration: 7 #0~
