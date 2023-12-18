@@ -155,6 +155,7 @@ public class SpreadService {
         int remaining = totalMoney;
         for (int i = 1; i < totalPeopleNum; i++) {
             int randomMaxValue = remaining - (totalPeopleNum - i);
+            randomMaxValue = (int) Math.round(randomMaxValue * 0.7); // 먼저 생성되는 난수에서 너무 큰 금액 가져가는 것 방지
             int randomNumber = random.nextInt(randomMaxValue - 1) + 1;
             list.add(randomNumber);
             remaining -= randomNumber;

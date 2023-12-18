@@ -16,8 +16,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
@@ -167,5 +169,4 @@ class SpreadServiceTest {
         //checkMsg
         System.out.println("allCount = " + allCount);
     }
-
 }
