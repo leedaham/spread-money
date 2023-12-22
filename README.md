@@ -1,6 +1,7 @@
 **JAVA17, Spring(boot), JPA, H2 Database**
 
 # 돈 뿌리기 API (practice project)
+- 카카오페이의 돈 뿌리기 기능 구현 연습 프로젝트
 
 ## 문제 해결 전략
 ### 뿌리기 API
