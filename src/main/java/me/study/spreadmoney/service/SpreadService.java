@@ -1,5 +1,6 @@
 package me.study.spreadmoney.service;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.study.spreadmoney.entity.Spread;
@@ -7,6 +8,7 @@ import me.study.spreadmoney.entity.SpreadDetail;
 import me.study.spreadmoney.exception.PredictableRuntimeException;
 import me.study.spreadmoney.repository.SpreadDetailRepository;
 import me.study.spreadmoney.repository.SpreadRepository;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,8 @@ public class SpreadService {
     private final SpreadRepository spreadRepository;
     private final SpreadDetailRepository spreadDetailRepository;
     private final Random random = new Random();
+
+    private final EntityManager em;
 
     //config.yml 설정 값
     @Value("${config.policy.spread-expire-date.unit}")
@@ -55,27 +59,39 @@ public class SpreadService {
         LocalDateTime receivableExpireDateTime = makeReceivableExpireDateTime(spreadDateTime);
         LocalDateTime viewableExpireDateTime = makeViewableExpireDateTime(spreadDateTime);
 
-        //고유 token 생성
-        String token = makeToken();
+        String token = null;
+        //Token 중복시 재시도, Token은 Unique 값이고, 중복일 경우 ConstraintViolationException 발생 함.
+        int retryCount=0;
+        while (retryCount < 10) {
+            try {
+                //고유 token 생성
+                token = makeToken();
 
-        //뿌릴 금액, 뿌릴 인원으로 최초 남은 금액, 남은 인원수 설정
-        int remainMoney = totalMoney;
-        int remainPeopleNum = totalPeopleNum;
+                //뿌릴 금액, 뿌릴 인원으로 최초 남은 금액, 남은 인원수 설정
+                int remainMoney = totalMoney;
+                int remainPeopleNum = totalPeopleNum;
 
-        //뿌리기 생성 및 저장
-        Spread spread = Spread.createSpread(
-                token, userId, roomId,
-                totalMoney, totalPeopleNum, remainMoney, remainPeopleNum,
-                spreadDateTime, receivableExpireDateTime, viewableExpireDateTime);
-        spreadRepository.save(spread);
+                //뿌리기 생성 및 저장
+                Spread spread = Spread.createSpread(
+                        token, userId, roomId,
+                        totalMoney, totalPeopleNum, remainMoney, remainPeopleNum,
+                        spreadDateTime, receivableExpireDateTime, viewableExpireDateTime);
+                spreadRepository.save(spread);
+                em.flush();
 
-        //뿌리기 세부사항 생성 및 저장(뿌릴 인원에 맞게 뿌릴 금액을 나누어 배정)
-        List<Integer> distributedMoneyList = makeRandomSpreadMoney(totalMoney, totalPeopleNum);
-        for (Integer distributedMoney : distributedMoneyList) {
-            SpreadDetail spreadDetail = SpreadDetail.createSpreadDetails(spread, distributedMoney);
-            spreadDetailRepository.save(spreadDetail);
+                //뿌리기 세부사항 생성 및 저장(뿌릴 인원에 맞게 뿌릴 금액을 나누어 배정)
+                List<Integer> distributedMoneyList = makeRandomSpreadMoney(totalMoney, totalPeopleNum);
+                for (Integer distributedMoney : distributedMoneyList) {
+                    SpreadDetail spreadDetail = SpreadDetail.createSpreadDetails(spread, distributedMoney);
+                    spreadDetailRepository.save(spreadDetail);
+                }
+                break;
+            } catch (ConstraintViolationException e) {
+                retryCount++;
+                log.warn("Token 중복으로 재시도, 재시도 횟수: {}", retryCount);
+                log.warn(e.getMessage());
+            }
         }
-
         return token;
     }
 
