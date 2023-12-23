@@ -16,10 +16,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doNothing;
@@ -123,8 +121,7 @@ class SpreadServiceTest {
         int numOfSpreadDetail = spreadDetailList.size();
 
         //then
-        assertThat(totalPeopleNum).isEqualTo(count);
-        assertThat(totalPeopleNum).isEqualTo(numOfSpreadDetail);
+        assertThat(totalPeopleNum).isEqualTo(count).isEqualTo(numOfSpreadDetail);
 
         //checkMsg
         System.out.println("totalPeopleNum = " + totalPeopleNum);
