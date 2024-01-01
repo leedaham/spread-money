@@ -103,6 +103,7 @@ public class ExpiredSpreadService {
     /**
      * API 요청 중 만료 Spread 데이터 이관은 사용자의 요청과 관련이 없음 여기서 발생하는 에러는 사용자에게 전달하지 않음.
      * @param spreadId 만료된 Spread ID
+     * @deprecated API 요청시에도 만료 여부 확인 후 만료된 뿌리기로 전환하였으나 스케쥴러에서만 기능하도록 변경
      */
     @Transactional
     public void spreadToExpireInApiRequest(Long spreadId) {

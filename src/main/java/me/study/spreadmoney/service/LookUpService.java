@@ -51,7 +51,7 @@ public class LookUpService {
         //조회 가능 기간 검증
         if(spread.getViewableExpireDateTime().isBefore(LocalDateTime.now())){
             //조회 만료 데이터 이관 (Spread, SpreadDetail -> ExpiredSpread)
-            expiredSpreadService.spreadToExpireInApiRequest(spread.getId());
+            //expiredSpreadService.spreadToExpireInApiRequest(spread.getId()); -> Scheduler only 수정 (2024.01.01)
             throw new PredictableRuntimeException("조회 가능일이 지났습니다.");
         }
 

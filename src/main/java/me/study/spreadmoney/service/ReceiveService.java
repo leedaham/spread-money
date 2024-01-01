@@ -48,7 +48,7 @@ public class ReceiveService {
         //만료시간 검증
         if (spread.getViewableExpireDateTime().isBefore(now)){
             //조회 만료 데이터 이관 (Spread, SpreadDetail -> ExpiredSpread)
-            expiredSpreadService.spreadToExpireInApiRequest(spread.getId());
+            //expiredSpreadService.spreadToExpireInApiRequest(spread.getId()); -> Scheduler only 수정 (2024.01.01)
             throw new PredictableRuntimeException("유효하지 않는 Token 값입니다.");
         } else if (spread.getReceivableExpireDateTime().isBefore(now)) {
             throw new PredictableRuntimeException("뿌린 건의 받기 시간이 만료 되었습니다. 만료 일시: "+spread.getReceivableExpireDateTime());
